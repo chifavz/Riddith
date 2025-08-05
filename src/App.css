@@ -36,3 +36,66 @@
     transform: rotate(360deg);
   }
 }
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: #ff4500; /* Reddit-style orange */
+  color: white;
+}
+
+/* Navigation links */
+.navbar a {
+  text-decoration: none;
+  color: white;
+  margin-left: 1.5rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+  color: #222;
+}
+/* App.css */
+
+/* Base layout for filter form */
+.filter-menu-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .filter-menu-form {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Label styling */
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151; /* Gray-700 */
+}
+
+/* Dropdown */
+.filter-select {
+  margin-left: 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db; /* Gray-300 */
+  border-radius: 0.375rem;
+}
+
+/* Search input */
+.filter-search-input {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  width: 100%;
+  max-width: 16rem; /* 256px */
+}
