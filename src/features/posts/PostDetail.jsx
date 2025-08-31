@@ -1,6 +1,7 @@
 // src/features/posts/PostDetail.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { fetchPostWithComments } from "./postAPI";
 import "./../../App.css";
 
 const PostDetail = () => {
@@ -8,26 +9,29 @@ const PostDetail = () => {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const fetchPostDetail = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`https://www.reddit.com/r/${subreddit}/comments/${postId}.json`);
-      const data = await response.json();
-
-      setPost(data[0].data.children[0].data);
-      setComments(data[1].data.children.map((child) => child.data));
-    } catch (err) {
-      console.error("Failed to load post details:", err);
-    }
-    setLoading(false);
-  };
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchPostDetail = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchPostWithComments(subreddit, postId);
+        setPost(data.post);
+        setComments(data.comments);
+      } catch (err) {
+        console.error("Failed to load post details:", err);
+        setError(err.message || "Failed to load post details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPostDetail();
   }, [subreddit, postId]);
 
   if (loading) return <p>Loading post...</p>;
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
   if (!post) return <p>Post not found.</p>;
 
   return (
