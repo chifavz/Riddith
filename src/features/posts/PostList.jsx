@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { fetchPostsBySubreddit, fetchPostsBySearch } from "./postAPI";
 
 
 
@@ -11,28 +13,26 @@ function PostList() {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    const fetchPosts = async () => {
+      setLoading(true);
+      setError(null);
 
-    const url =
-      filter === "subreddit"
-        ? `https://www.reddit.com/r/${subreddit}.json`
-        : `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}`;
-
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch posts");
-        return res.json();
-      })
-      .then((data) => {
-        const items = data.data.children.map((child) => child.data);
-        setPosts(items);
-        setLoading(false);
-      })
-      .catch((err) => {
+      try {
+        let data;
+        if (filter === "subreddit") {
+          data = await fetchPostsBySubreddit(subreddit);
+        } else {
+          data = await fetchPostsBySearch(query);
+        }
+        setPosts(data);
+      } catch (err) {
         setError(err.message || "Unknown error");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchPosts();
   }, [filter, subreddit, query]);
 
   return (
@@ -71,9 +71,9 @@ function PostList() {
       <ul>
         {posts.map((post) => (
           <li key={post.id} style={{ marginBottom: "1rem" }}>
-            <a href={`https://reddit.com${post.permalink}`} target="_blank" rel="noreferrer">
+            <Link to={`/r/${post.subreddit}/comments/${post.id}`}>
               {post.title}
-            </a>
+            </Link>
             <p style={{ fontSize: "0.9rem", color: "#555" }}>
               by {post.author} | {post.ups} upvotes
             </p>
