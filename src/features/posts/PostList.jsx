@@ -1,46 +1,41 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { fetchPostsBySubreddit, fetchPostsBySearch } from "./postAPI";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchPosts, searchPosts, setFilter, setSubreddit, setQuery } from "./postsSlice";
 
 
 
 function PostList() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [filter, setFilter] = useState("subreddit");
-  const [subreddit, setSubreddit] = useState("popular");
-  const [query, setQuery] = useState("");
+  const dispatch = useDispatch();
+  const { posts, status, error, filter, subreddit, query } = useSelector(state => state.posts);
+  const loading = status === 'loading';
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true);
-      setError(null);
+    if (filter === "subreddit") {
+      dispatch(fetchPosts(subreddit));
+    } else if (query.trim()) {
+      dispatch(searchPosts(query));
+    }
+  }, [dispatch, filter, subreddit, query]);
 
-      try {
-        let data;
-        if (filter === "subreddit") {
-          data = await fetchPostsBySubreddit(subreddit);
-        } else {
-          data = await fetchPostsBySearch(query);
-        }
-        setPosts(data);
-      } catch (err) {
-        setError(err.message || "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleFilterChange = (newFilter) => {
+    dispatch(setFilter(newFilter));
+  };
 
-    fetchPosts();
-  }, [filter, subreddit, query]);
+  const handleSubredditChange = (newSubreddit) => {
+    dispatch(setSubreddit(newSubreddit));
+  };
+
+  const handleQueryChange = (newQuery) => {
+    dispatch(setQuery(newQuery));
+  };
 
   return (
     <div style={{ padding: "1rem" }}>
       <div style={{ marginBottom: "1rem" }}>
         <label>
           Filter:
-          <select value={filter} onChange={(e) => setFilter(e.target.value)} style={{ marginLeft: 8 }}>
+          <select value={filter} onChange={(e) => handleFilterChange(e.target.value)} style={{ marginLeft: 8 }}>
             <option value="subreddit">Subreddit</option>
             <option value="search">Search</option>
           </select>
@@ -50,7 +45,7 @@ function PostList() {
           <input
             type="text"
             value={subreddit}
-            onChange={(e) => setSubreddit(e.target.value)}
+            onChange={(e) => handleSubredditChange(e.target.value)}
             placeholder="Enter subreddit"
             style={{ marginLeft: 12, padding: 6 }}
           />
@@ -58,7 +53,7 @@ function PostList() {
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleQueryChange(e.target.value)}
             placeholder="Search Reddit"
             style={{ marginLeft: 12, padding: 6 }}
           />

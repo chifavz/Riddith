@@ -2,7 +2,10 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
 import PostList from "../PostList";
+import postsReducer from "../postsSlice";
 import * as postAPI from "../postAPI";
 
 // ✅ Mock the postAPI functions
@@ -10,6 +13,26 @@ jest.mock("../postAPI", () => ({
   fetchPostsBySubreddit: jest.fn(),
   fetchPostsBySearch: jest.fn(),
 }));
+
+// Create a test store
+const createTestStore = (initialState = {}) => {
+  return configureStore({
+    reducer: {
+      posts: postsReducer,
+    },
+    preloadedState: {
+      posts: {
+        posts: [],
+        status: 'idle',
+        error: null,
+        filter: 'subreddit',
+        subreddit: 'popular',
+        query: '',
+        ...initialState,
+      },
+    },
+  });
+};
 
 // ✅ Setup mock API responses
 beforeEach(() => {
@@ -41,10 +64,14 @@ afterEach(() => {
 });
 
 test("allows switching to search filter and fetching search results", async () => {
+  const store = createTestStore();
+  
   render(
-    <MemoryRouter>
-      <PostList />
-    </MemoryRouter>
+    <Provider store={store}>
+      <MemoryRouter>
+        <PostList />
+      </MemoryRouter>
+    </Provider>
   );
 
   // simulate filter change to "search"
