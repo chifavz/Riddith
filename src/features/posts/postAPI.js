@@ -1,5 +1,3 @@
-// src/features/posts/postAPI.js
-
 const BASE_URL = 'https://www.reddit.com';
 
 /**
@@ -29,6 +27,15 @@ export const fetchPostsBySearch = async (query) => {
  */
 export const fetchPostWithComments = async (subreddit, postId) => {
   const response = await fetch(`${BASE_URL}/r/${subreddit}/comments/${postId}.json`);
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    const text = await response.text();
+    throw new Error(
+      `Expected JSON response, but received: ${text.slice(0, 200)}`
+    );
+  }
+
   const json = await response.json();
   return {
     post: json[0].data.children[0].data,
