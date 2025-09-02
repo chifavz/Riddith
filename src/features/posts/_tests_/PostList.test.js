@@ -44,6 +44,7 @@ beforeEach(() => {
       permalink: "/r/reactjs/comments/testpost",
       author: "testuser",
       ups: 100,
+      thumbnail: "https://example.com/thumbnail1.jpg",
     },
     {
       id: "2",
@@ -91,4 +92,31 @@ test("allows switching to search filter and fetching search results", async () =
     expect(screen.getByText("Test Post")).toBeInTheDocument();
     expect(screen.getByText("Another Post")).toBeInTheDocument();
   });
+});
+
+test("renders images as clickable links when thumbnails are available", async () => {
+  const store = createTestStore();
+  
+  render(
+    <Provider store={store}>
+      <MemoryRouter>
+        <PostList />
+      </MemoryRouter>
+    </Provider>
+  );
+
+  // wait for posts to appear
+  await waitFor(() => {
+    expect(screen.getByText("Test Post")).toBeInTheDocument();
+  });
+
+  // check that the image is rendered and is clickable
+  const image = screen.getByAltText("Test Post");
+  expect(image).toBeInTheDocument();
+  expect(image).toHaveAttribute("src", "https://example.com/thumbnail1.jpg");
+  
+  // check that the image is wrapped in a link
+  const imageLink = image.closest('a');
+  expect(imageLink).toBeInTheDocument();
+  expect(imageLink).toHaveAttribute("href", "/r/reactjs/comments/1");
 });
