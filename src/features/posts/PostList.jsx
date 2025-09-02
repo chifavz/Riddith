@@ -69,6 +69,22 @@ function PostList() {
             <Link to={`/r/${post.subreddit}/comments/${post.id}`}>
               {post.title}
             </Link>
+            {post.thumbnail && post.thumbnail.startsWith('http') && (
+              <div style={{ marginTop: "0.5rem" }}>
+                <Link to={`/r/${post.subreddit}/comments/${post.id}`}>
+                  <img 
+                    src={post.thumbnail} 
+                    alt={post.title} 
+                    style={{ 
+                      maxWidth: "150px", 
+                      maxHeight: "150px", 
+                      display: "block",
+                      cursor: "pointer"
+                    }} 
+                  />
+                </Link>
+              </div>
+            )}
             <p style={{ fontSize: "0.9rem", color: "#555" }}>
               by {post.author} | {post.ups} upvotes
             </p>
