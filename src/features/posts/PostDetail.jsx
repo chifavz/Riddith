@@ -2,16 +2,28 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchPostWithComments } from "./postAPI";
+import { getPostImageUrl } from "../../utils/imageUtils";
 import "./../../App.css";
 
-const PostDetail = () => {
+const PostDetail = ({ mockPost }) => {
   const { subreddit, postId } = useParams();
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState(mockPost || null);
   const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!mockPost);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (mockPost) {
+      // Skip API call if mock data is provided
+      setPost(mockPost);
+      setComments([
+        { id: 'mock1', author: 'user1', body: 'Great post!' },
+        { id: 'mock2', author: 'user2', body: 'Thanks for sharing!' }
+      ]);
+      setLoading(false);
+      return;
+    }
+
     const fetchPostDetail = async () => {
       setLoading(true);
       setError(null);
@@ -28,11 +40,14 @@ const PostDetail = () => {
     };
 
     fetchPostDetail();
-  }, [subreddit, postId]);
+  }, [subreddit, postId, mockPost]);
 
   if (loading) return <p>Loading post...</p>;
   if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
   if (!post) return <p>Post not found.</p>;
+
+  // Get the best image URL for this post
+  const imageUrl = getPostImageUrl(post);
 
   return (
     <div className="post-detail-container">
@@ -41,8 +56,17 @@ const PostDetail = () => {
       <div className="post-detail">
         <h2>{post.title}</h2>
         {post.selftext && <p className="post-body">{post.selftext}</p>}
-        {post.url && post.post_hint === "image" && (
-          <img src={post.url} alt="Post visual" className="post-image" />
+        {imageUrl && (
+          <div className="post-image-container">
+            <img src={imageUrl} alt="Post visual" className="post-image" />
+          </div>
+        )}
+        {post.url && !imageUrl && (
+          <div className="post-link">
+            <a href={post.url} target="_blank" rel="noopener noreferrer" className="external-link">
+              🔗 {post.url}
+            </a>
+          </div>
         )}
         <div className="post-meta">
           <span>👍 {post.ups}</span> • <span>{post.num_comments} comments</span>

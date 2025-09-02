@@ -5,6 +5,7 @@ import { fetchPosts } from './features/posts/postsSlice';
 import PostList from './features/posts/PostList';
 import PostDetail from './features/posts/PostDetail';
 import Header from './components/Header';
+import ImageTestPage from './components/ImageTestPage';
 
 import './App.css';
 
@@ -21,6 +22,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<PostList />} />
+          <Route path="/test-images" element={<ImageTestPage />} />
           <Route path="/posts/:postId" element={<PostDetail />} />
           <Route path="/r/:subreddit/comments/:postId" element={<PostDetail />} />
         </Routes>
