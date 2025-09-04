@@ -14,6 +14,30 @@ jest.mock("../postAPI", () => ({
   fetchPostsBySearch: jest.fn(),
 }));
 
+// ✅ Mock the AI Waitress service
+jest.mock("../../../services/aiWaitressService", () => ({
+  aiWaitress: {
+    authenticate: jest.fn().mockResolvedValue(true),
+    analyzeContent: jest.fn().mockResolvedValue({ analyzed: false }),
+    getRecommendations: jest.fn().mockResolvedValue([]),
+    hasAccess: jest.fn().mockReturnValue(true)
+  }
+}));
+
+// ✅ Mock the API config
+jest.mock("../../../config/apiConfig", () => ({
+  API_CONFIG: {
+    CHIEF_DASHBOARD: {
+      BASE_URL: 'https://api.test.com',
+      ENDPOINTS: { POSTS: '/posts', SEARCH: '/search' }
+    }
+  },
+  AI_WAITRESS_ACCESS_LEVELS: {
+    READ_ONLY: 'read_only',
+    ANALYZE: 'analyze'
+  }
+}));
+
 // Create a test store
 const createTestStore = (initialState = {}) => {
   return configureStore({
