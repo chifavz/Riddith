@@ -9,7 +9,7 @@ export const fetchPostsBySubreddit = async (subreddit = 'popular') => {
 
   // Reddit sometimes sends an HTML error page on bad requests
   const contentType = response.headers.get('content-type');
-  if (!contentType || !contentType.includes('application/json')) {
+  if (!contentType || !contentType.toLowerCase().trim().startsWith('application/json')) {
     throw new Error(`Expected JSON response, but received: ${contentType}`);
   }
 
@@ -26,7 +26,7 @@ export const fetchPostsBySearch = async (query) => {
 
   // Reddit sometimes sends an HTML error page on bad requests
   const contentType = response.headers.get('content-type');
-  if (!contentType || !contentType.includes('application/json')) {
+  if (!contentType || !contentType.toLowerCase().trim().startsWith('application/json')) {
     throw new Error(`Expected JSON response, but received: ${contentType}`);
   }
 
@@ -43,7 +43,7 @@ export const fetchPostWithComments = async (subreddit, postId) => {
   const response = await fetch(`${BASE_URL}/r/${subreddit}/comments/${postId}.json`);
 
   const contentType = response.headers.get("content-type");
-  if (!contentType || !contentType.includes("application/json")) {
+  if (!contentType || !contentType.toLowerCase().trim().startsWith("application/json")) {
     const text = await response.text();
     throw new Error(
       `Expected JSON response, but received: ${text.slice(0, 200)}`
