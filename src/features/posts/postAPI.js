@@ -10,7 +10,7 @@ export const fetchPostsBySubreddit = async (subreddit = 'popular') => {
   // Reddit sometimes sends an HTML error page on bad requests
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
-    throw new Error(`Invalid response type: ${contentType}`);
+    throw new Error(`Expected JSON response, but received: ${contentType}`);
   }
 
   const json = await response.json();
@@ -27,7 +27,7 @@ export const fetchPostsBySearch = async (query) => {
   // Reddit sometimes sends an HTML error page on bad requests
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
-    throw new Error(`Invalid response type: ${contentType}`);
+    throw new Error(`Expected JSON response, but received: ${contentType}`);
   }
 
   const json = await response.json();

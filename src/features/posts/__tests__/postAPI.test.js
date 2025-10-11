@@ -43,7 +43,7 @@ describe('postAPI', () => {
         },
       });
 
-      await expect(fetchPostsBySubreddit('test')).rejects.toThrow('Invalid response type: text/html');
+      await expect(fetchPostsBySubreddit('test')).rejects.toThrow('Expected JSON response, but received: text/html');
     });
 
     test('throws error when content-type header is missing', async () => {
@@ -53,7 +53,7 @@ describe('postAPI', () => {
         },
       });
 
-      await expect(fetchPostsBySubreddit('test')).rejects.toThrow('Invalid response type: null');
+      await expect(fetchPostsBySubreddit('test')).rejects.toThrow('Expected JSON response, but received: null');
     });
 
     test('uses default subreddit when no argument is provided', async () => {
@@ -110,7 +110,7 @@ describe('postAPI', () => {
         },
       });
 
-      await expect(fetchPostsBySearch('test')).rejects.toThrow('Invalid response type: text/html');
+      await expect(fetchPostsBySearch('test')).rejects.toThrow('Expected JSON response, but received: text/html');
     });
 
     test('throws error when content-type header is missing', async () => {
@@ -120,7 +120,7 @@ describe('postAPI', () => {
         },
       });
 
-      await expect(fetchPostsBySearch('test')).rejects.toThrow('Invalid response type: null');
+      await expect(fetchPostsBySearch('test')).rejects.toThrow('Expected JSON response, but received: null');
     });
 
     test('properly encodes search query', async () => {
