@@ -74,6 +74,60 @@ describe('postAPI', () => {
       
       expect(fetch).toHaveBeenCalledWith('https://www.reddit.com/r/popular.json');
     });
+
+    test('accepts content-type with charset parameter', async () => {
+      const mockData = {
+        data: {
+          children: [{ data: { id: '1', title: 'Test Post' } }],
+        },
+      };
+
+      fetch.mockResolvedValueOnce({
+        headers: {
+          get: jest.fn().mockReturnValue('application/json; charset=utf-8'),
+        },
+        json: jest.fn().mockResolvedValue(mockData),
+      });
+
+      const result = await fetchPostsBySubreddit('test');
+      expect(result).toEqual([{ id: '1', title: 'Test Post' }]);
+    });
+
+    test('accepts content-type in uppercase', async () => {
+      const mockData = {
+        data: {
+          children: [{ data: { id: '1', title: 'Test Post' } }],
+        },
+      };
+
+      fetch.mockResolvedValueOnce({
+        headers: {
+          get: jest.fn().mockReturnValue('APPLICATION/JSON'),
+        },
+        json: jest.fn().mockResolvedValue(mockData),
+      });
+
+      const result = await fetchPostsBySubreddit('test');
+      expect(result).toEqual([{ id: '1', title: 'Test Post' }]);
+    });
+
+    test('accepts content-type with leading/trailing whitespace', async () => {
+      const mockData = {
+        data: {
+          children: [{ data: { id: '1', title: 'Test Post' } }],
+        },
+      };
+
+      fetch.mockResolvedValueOnce({
+        headers: {
+          get: jest.fn().mockReturnValue('  application/json  '),
+        },
+        json: jest.fn().mockResolvedValue(mockData),
+      });
+
+      const result = await fetchPostsBySubreddit('test');
+      expect(result).toEqual([{ id: '1', title: 'Test Post' }]);
+    });
   });
 
   describe('fetchPostsBySearch', () => {
@@ -140,6 +194,42 @@ describe('postAPI', () => {
       await fetchPostsBySearch('test & query');
       
       expect(fetch).toHaveBeenCalledWith('https://www.reddit.com/search.json?q=test%20%26%20query&limit=25');
+    });
+
+    test('accepts content-type with charset parameter', async () => {
+      const mockData = {
+        data: {
+          children: [{ data: { id: '1', title: 'Search Result' } }],
+        },
+      };
+
+      fetch.mockResolvedValueOnce({
+        headers: {
+          get: jest.fn().mockReturnValue('application/json; charset=utf-8'),
+        },
+        json: jest.fn().mockResolvedValue(mockData),
+      });
+
+      const result = await fetchPostsBySearch('test');
+      expect(result).toEqual([{ id: '1', title: 'Search Result' }]);
+    });
+
+    test('accepts content-type in mixed case', async () => {
+      const mockData = {
+        data: {
+          children: [{ data: { id: '1', title: 'Search Result' } }],
+        },
+      };
+
+      fetch.mockResolvedValueOnce({
+        headers: {
+          get: jest.fn().mockReturnValue('Application/Json'),
+        },
+        json: jest.fn().mockResolvedValue(mockData),
+      });
+
+      const result = await fetchPostsBySearch('test');
+      expect(result).toEqual([{ id: '1', title: 'Search Result' }]);
     });
   });
 
@@ -208,6 +298,56 @@ describe('postAPI', () => {
       await expect(fetchPostWithComments('test', 'post123')).rejects.toThrow(
         'Expected JSON response, but received: <html><body>Error</body></html>'
       );
+    });
+
+    test('accepts content-type with charset parameter', async () => {
+      const mockData = [
+        {
+          data: {
+            children: [{ data: { id: '1', title: 'Test Post' } }],
+          },
+        },
+        {
+          data: {
+            children: [{ data: { id: 'c1', body: 'Comment' } }],
+          },
+        },
+      ];
+
+      fetch.mockResolvedValueOnce({
+        headers: {
+          get: jest.fn().mockReturnValue('application/json; charset=utf-8'),
+        },
+        json: jest.fn().mockResolvedValue(mockData),
+      });
+
+      const result = await fetchPostWithComments('test', 'post123');
+      expect(result.post).toEqual({ id: '1', title: 'Test Post' });
+    });
+
+    test('accepts content-type in uppercase', async () => {
+      const mockData = [
+        {
+          data: {
+            children: [{ data: { id: '1', title: 'Test Post' } }],
+          },
+        },
+        {
+          data: {
+            children: [{ data: { id: 'c1', body: 'Comment' } }],
+          },
+        },
+      ];
+
+      fetch.mockResolvedValueOnce({
+        headers: {
+          get: jest.fn().mockReturnValue('APPLICATION/JSON'),
+        },
+        json: jest.fn().mockResolvedValue(mockData),
+      });
+
+      const result = await fetchPostWithComments('test', 'post123');
+      expect(result.post).toEqual({ id: '1', title: 'Test Post' });
     });
   });
 });
