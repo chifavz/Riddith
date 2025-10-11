@@ -6,6 +6,13 @@ const BASE_URL = 'https://www.reddit.com';
  */
 export const fetchPostsBySubreddit = async (subreddit = 'popular') => {
   const response = await fetch(`${BASE_URL}/r/${subreddit}.json`);
+
+  // Reddit sometimes sends an HTML error page on bad requests
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    throw new Error(`Expected JSON response, but received: ${contentType}`);
+  }
+
   const json = await response.json();
   return json.data.children.map((child) => child.data);
 };
@@ -16,6 +23,13 @@ export const fetchPostsBySubreddit = async (subreddit = 'popular') => {
  */
 export const fetchPostsBySearch = async (query) => {
   const response = await fetch(`${BASE_URL}/search.json?q=${encodeURIComponent(query)}&limit=25`);
+
+  // Reddit sometimes sends an HTML error page on bad requests
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    throw new Error(`Expected JSON response, but received: ${contentType}`);
+  }
+
   const json = await response.json();
   return json.data.children.map((child) => child.data);
 };
